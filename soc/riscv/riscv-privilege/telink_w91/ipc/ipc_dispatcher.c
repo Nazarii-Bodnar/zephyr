@@ -26,6 +26,15 @@ static struct k_mutex  ipc_mutex;
 static struct k_sem    ipc_sem_bound;
 static sys_slist_t     ipc_records;
 
+#define PRINTK_IPC_DATA(text, data, len)           \
+do {                                               \
+	printk("%s: ", text);                          \
+	for (int i = 0; i < (len); i++) {              \
+		printk("0x%02x ", ((uint8_t *)(data))[i]); \
+	}                                              \
+	printk("\n");                                  \
+} while (0)
+
 static void endpoint_bound(void *priv)
 {
 	k_sem_give(&ipc_sem_bound);
@@ -37,6 +46,8 @@ static void endpoint_received(const void *data, size_t len, void *priv)
 		uint32_t *id = (uint32_t *)data;
 		bool processed = false;
 		struct ipc_dispatcher_record *record;
+
+		PRINTK_IPC_DATA("D25 ipc rx", data, len);
 
 		k_mutex_lock(&ipc_mutex, K_FOREVER);
 		SYS_SLIST_FOR_EACH_CONTAINER(&ipc_records, record, node) {
@@ -147,6 +158,8 @@ void ipc_dispatcher_rm(uint32_t id)
 
 int ipc_dispatcher_send(const void *data, size_t len)
 {
+	PRINTK_IPC_DATA("D25 ipc tx", data, len);
+
 	return ipc_service_send(&ept, data, len);
 }
 
