@@ -53,11 +53,11 @@
 			ranges;
 
 			sram_tx: memory@40000000 {
-				reg = <0x40000000 0x3000>;
+				reg = <0x40000000 0x2000>;
 			};
 
-			sram_rx: memory@40003000 {
-				reg = <0x40003000 0x3000>;
+			sram_rx: memory@40002000 {
+				reg = <0x40002000 0x2000>;
 			};
 		};
 
