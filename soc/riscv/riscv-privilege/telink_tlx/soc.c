@@ -32,6 +32,7 @@
 	#define CLK_60MHZ                   60000000u
 	#define CLK_80MHZ                   80000000u
 	#define CLK_120MHZ                  120000000u
+	#define CLK_240MHZ                  240000000u
 #endif
 
 /* MID register flash size */
@@ -81,8 +82,9 @@
 		(DT_PROP(DT_PATH(cpus, cpu_0), clock_frequency) != CLK_48MHZ) && \
 		(DT_PROP(DT_PATH(cpus, cpu_0), clock_frequency) != CLK_60MHZ) && \
 		(DT_PROP(DT_PATH(cpus, cpu_0), clock_frequency) != CLK_80MHZ) && \
-		(DT_PROP(DT_PATH(cpus, cpu_0), clock_frequency) != CLK_120MHZ))
-		#error "Invalid clock-frequency. Supported values: 24, 40, 48, 60, 80 and 120 MHz"
+		(DT_PROP(DT_PATH(cpus, cpu_0), clock_frequency) != CLK_120MHZ) && \
+		(DT_PROP(DT_PATH(cpus, cpu_0), clock_frequency) != CLK_240MHZ))
+		#error "Invalid clock-frequency. Supported values: 24,40,48,60,80,120,240 MHz"
 	#endif
 #endif
 
@@ -137,6 +139,13 @@ static int soc_tlx_init(void)
 	/* system init */
 	sys_init(POWER_MODE, VBAT_TYPE, INTERNAL_CAP_XTAL24M);
 
+#if CONFIG_SOC_RISCV_TELINK_TL721X
+	if (cclk == CLK_240MHZ) {
+		pm_set_dvdd(CORE_0P9V_SRAM_0P9V_BB_0P9V, DMA1, 1000);
+	}
+	pm_set_ret_ldo_voltage(RET_LDO_TRIM_0P65V);
+#endif
+
 #if CONFIG_PM
 	gpio_shutdown(GPIO_ALL);
 #endif /* CONFIG_PM */
@@ -165,6 +174,10 @@ static int soc_tlx_init(void)
 	case CLK_60MHZ:
 		PLL_240M_CCLK_60M_HCLK_60M_PCLK_15M_MSPI_48M;
 		break;
+
+	case CLK_80MHZ:
+		PLL_240M_CCLK_80M_HCLK_40M_PCLK_40M_MSPI_48M;
+		break;
 #endif
 
 #if CONFIG_SOC_RISCV_TELINK_TL321X
@@ -172,6 +185,16 @@ static int soc_tlx_init(void)
 		PLL_192M_CCLK_96M_HCLK_48M_PCLK_48M_MSPI_48M;
 		break;
 #endif
+
+#if CONFIG_SOC_RISCV_TELINK_TL721X
+	case CLK_120MHZ:
+		PLL_240M_CCLK_120M_HCLK_60M_PCLK_60M_MSPI_48M;
+		break;
+	case CLK_240MHZ:
+		PLL_240M_CCLK_240M_HCLK_120M_PCLK_120M_MSPI_48M;
+		break;
+#endif
+
 	}
 
 	/* Init Machine Timer source clock: 32 KHz RC */
@@ -232,11 +255,24 @@ void soc_tlx_restore(void)
 	case CLK_60MHZ:
 		PLL_240M_CCLK_60M_HCLK_60M_PCLK_15M_MSPI_48M;
 		break;
+
+	case CLK_80MHZ:
+		PLL_240M_CCLK_80M_HCLK_40M_PCLK_40M_MSPI_48M;
+		break;
 #endif
 
 #if CONFIG_SOC_RISCV_TELINK_TL321X
 	case CLK_96MHZ:
 		PLL_192M_CCLK_96M_HCLK_48M_PCLK_48M_MSPI_48M;
+		break;
+#endif
+
+#if CONFIG_SOC_RISCV_TELINK_TL721X
+	case CLK_120MHZ:
+		PLL_240M_CCLK_120M_HCLK_60M_PCLK_60M_MSPI_48M;
+		break;
+	case CLK_240MHZ:
+		PLL_240M_CCLK_240M_HCLK_120M_PCLK_120M_MSPI_48M;
 		break;
 #endif
 	}
