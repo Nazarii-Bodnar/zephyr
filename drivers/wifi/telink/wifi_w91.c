@@ -481,8 +481,6 @@ static void wifi_w91_l2_rx_cb(const void *data, size_t len, void *param)
 /* APIs implementation: wifi tx l2 data */
 static int wifi_w91_l2_tx(const struct device *dev, struct net_pkt *pkt)
 {
-	LOG_INF("%s", __func__);
-
 	int err;
 	struct wifi_w91_data *data = dev->data;
 	const struct wifi_w91_config *cfg = dev->config;
